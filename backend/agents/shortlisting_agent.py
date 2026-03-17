@@ -7,13 +7,15 @@ logger = logging.getLogger(__name__)
 SHORTLIST_THRESHOLD = 0.6
 
 
+from agents.skill_agent import normalize_skill
+
 def shortlist_candidates(candidates: List[dict], jd_skills: List[str] = None, threshold: float = SHORTLIST_THRESHOLD) -> List[dict]:
     """
     Mark candidates as 'Shortlisted' if skill match percentage >= threshold.
+    Uses normalization to catch 'React' vs 'ReactJS' etc.
     """
     logger.info(f"Running Shortlisting Agent (Criteria: {threshold*100}% tech skill match)...")
     
-    # If no skills were extracted from JD, fallback to similarity score
     if not jd_skills:
         logger.warning("No JD skills extracted. Using AI similarity score as fallback.")
         for c in candidates:
@@ -21,19 +23,19 @@ def shortlist_candidates(candidates: List[dict], jd_skills: List[str] = None, th
             c["status"] = "Shortlisted" if score >= threshold else "Rejected"
         return candidates
 
-    jd_skills_set = {s.lower() for s in jd_skills}
-    total_jd_skills = len(jd_skills_set)
+    # Normalize JD skills for matching
+    jd_skills_norm = {normalize_skill(s) for s in jd_skills if normalize_skill(s)}
+    total_jd_skills = len(jd_skills_norm)
 
     for c in candidates:
-        cand_skills_set = {s.lower() for s in (c.get("skills") or [])}
+        cand_skills_norm = {normalize_skill(s) for s in (c.get("skills") or []) if normalize_skill(s)}
         
-        # Intersection: find skills present in both
-        matching_skills = jd_skills_set.intersection(cand_skills_set)
+        # Intersection on normalized skills
+        matching_skills = jd_skills_norm.intersection(cand_skills_norm)
         match_count = len(matching_skills)
         
-        match_perc = match_count / total_jd_skills
+        match_perc = match_count / total_jd_skills if total_jd_skills > 0 else 0
         
-        # Store the specific match for transparency
         c["skill_match_perc"] = round(match_perc, 4)
         c["status"] = "Shortlisted" if match_perc >= threshold else "Rejected"
         

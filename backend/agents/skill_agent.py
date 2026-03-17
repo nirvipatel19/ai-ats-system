@@ -8,18 +8,20 @@ logger = logging.getLogger(__name__)
 # Strict Technical Skill Patterns
 SKILL_PATTERNS = [
     # Programming Languages
-    r"\b(python|javascript|java|c\+\+|c\#|ruby|golang|rust|swift|kotlin|php|typescript|scala|r|bash|shell)\b",
+    r"\b(python|javascript|java|c\+\+|c\#|ruby|golang|rust|swift|kotlin|php|typescript|scala|r|bash|shell|perl|lua|dart)\b",
     # Frontend/Backend Frameworks
-    r"\b(react|reactjs|vue|vuejs|angular|next\.?js|nuxt\.?js|svelte|tailwindcss|bootstrap|sass|less)\b",
-    r"\b(node\.?js|express|django|flask|fastapi|spring|spring boot|laravel|dotnet|ruby on rails)\b",
+    r"\b(react|reactjs|vue|vuejs|angular|next\.?js|nuxt\.?js|svelte|tailwindcss|bootstrap|sass|less|jquery)\b",
+    r"\b(node\.?js|express|django|flask|fastapi|spring|spring boot|laravel|dotnet|ruby on rails|asp\.net|symfony|codeigniter)\b",
     # Databases & Tools
-    r"\b(sql|postgresql|postgres|mysql|mongodb|redis|cassandra|elasticsearch|oracle|sqlite|prisma|sequelize|mongoose)\b",
+    r"\b(sql|postgresql|postgres|mysql|mongodb|redis|cassandra|elasticsearch|oracle|sqlite|prisma|sequelize|mongoose|mariadb|dynamodb|firebase|supabase)\b",
     # Cloud & DevOps
-    r"\b(aws|azure|gcp|google cloud|docker|kubernetes|k8s|jenkins|terraform|ansible|git|github|gitlab|bitbucket|cicd|linux|unix)\b",
+    r"\b(aws|azure|gcp|google cloud|docker|kubernetes|k8s|jenkins|terraform|ansible|git|github|gitlab|bitbucket|cicd|linux|unix|heroku|digitalocean|circleci|travis)\b",
     # AI/ML/Data
-    r"\b(machine learning|data science|nlp|deep learning|artificial intelligence|pytorch|tensorflow|scikit-learn|pandas|numpy|opencv|keras|llama|openai|llm|huggingface|langchain)\b",
+    r"\b(machine learning|data science|nlp|deep learning|artificial intelligence|pytorch|tensorflow|scikit-learn|pandas|numpy|opencv|keras|llama|openai|llm|huggingface|langchain|tableau|powerbi|spark|hadoop|kafka)\b",
     # APIs & Communication
-    r"\b(api|rest|graphql|grpc|websockets|json|xml|microservices|mqtt|amqp|kafka|rabbitmq)\b",
+    r"\b(api|rest|graphql|grpc|websockets|json|xml|microservices|mqtt|amqp|rabbitmq|soap|postman|swagger)\b",
+    # Mobile & Other Tech
+    r"\b(android|ios|flutter|react native|ionic|xamarin|unity|unreal engine|solidworks|autocad|photoshop)\b",
 ]
 
 
@@ -40,8 +42,15 @@ NON_SKILL_BLACKLIST = {
 # Known valid abbreviations (3 chars or fewer)
 VALID_SHORT_SKILLS = {
     "aws", "gcp", "nlp", "llm", "api", "sql", "git", "css", "js", "ts", "gpt", 
-    "ml", "ai", "db", "os", "vpc", "ec2", "s3", "iam", "sh", "ann", "cnn"
+    "ml", "ai", "db", "os", "vpc", "ec2", "s3", "iam", "sh", "ann", "cnn", "iot"
 }
+
+def normalize_skill(s: str) -> str:
+    """Normalize skill string to aid matching (e.g., reactjs -> react)."""
+    s = s.lower().strip()
+    # Remove common suffixes/separators
+    s = s.replace('.js', '').replace('js', '').replace(' ', '').replace('-', '')
+    return s
 
 def extract_skills(text: str) -> List[str]:
     """Extract strictly technical skills from text with high precision."""
