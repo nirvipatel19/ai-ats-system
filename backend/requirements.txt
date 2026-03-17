@@ -1,0 +1,15 @@
+fastapi==0.109.2
+uvicorn[standard]==0.27.1
+python-multipart==0.0.9
+pdfplumber==0.10.4
+python-docx==1.1.0
+sentence-transformers==2.3.1
+numpy==1.26.4
+# Auth & Database
+passlib[bcrypt]==1.7.4
+python-jose[cryptography]==3.3.0
+aiosqlite==0.19.0
+pytest>=7.0.0
+pytest-asyncio>=0.23.0
+pytesseract==0.3.10
+Pillow==10.2.0
