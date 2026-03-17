@@ -369,11 +369,18 @@ function StudentPage() {
                   <div className="job-card-header">
                     <h4>{jd.title}</h4>
                   </div>
+                  <div className="job-card-body">
+                    <p className="description-preview">
+                      {jd.description_text 
+                        ? jd.description_text.slice(0, 150) + "..." 
+                        : "Click to view full description."}
+                    </p>
+                  </div>
                   <div className="job-card-meta">
                     <span className="meta-tag"><Icons.FileText /> Description loaded</span>
                   </div>
                   <button className={`select-btn ${selectedJd === jd.id ? 'active' : ''}`}>
-                    {selectedJd === jd.id ? 'Selected to Apply' : 'Select'}
+                    {selectedJd === jd.id ? 'Selected to Apply' : 'View & Apply'}
                   </button>
                 </div>
               ))
@@ -385,6 +392,25 @@ function StudentPage() {
             )}
           </div>
         </section>
+
+        {selectedJd && (
+          <section className="glass-panel slide-up">
+            <div className="panel-header">
+              <h3><Icons.FileText /> Job Details: {selectedJobDetail?.title}</h3>
+            </div>
+            <div className="job-full-description">
+              <div className="description-content">
+                {selectedJobDetail?.description_text ? (
+                   selectedJobDetail.description_text.split('\n').map((line, i) => (
+                     <p key={i}>{line}</p>
+                   ))
+                ) : (
+                  <p className="dim">No detailed description available for this role.</p>
+                )}
+              </div>
+            </div>
+          </section>
+        )}
 
         {selectedJd && (
           <section className="glass-panel slide-up">

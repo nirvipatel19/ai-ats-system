@@ -43,6 +43,7 @@ def init_db():
             title TEXT NOT NULL,
             filename TEXT NOT NULL,
             content BLOB NOT NULL,
+            description_text TEXT,
             created_at TEXT DEFAULT CURRENT_TIMESTAMP
         );
 
@@ -168,12 +169,12 @@ def get_resumes_for_jd(jd_id: int) -> list[tuple[str, bytes]]:
     return [(r["filename"], bytes(r["content"])) for r in rows]
 
 
-def add_job_description(title: str, filename: str, content: bytes) -> int:
+def add_job_description(title: str, filename: str, content: bytes, description_text: str = None) -> int:
     conn = get_conn()
     cur = conn.cursor()
     cur.execute(
-        "INSERT INTO job_descriptions (title, filename, content) VALUES (?, ?, ?)",
-        (title, filename, content),
+        "INSERT INTO job_descriptions (title, filename, content, description_text) VALUES (?, ?, ?, ?)",
+        (title, filename, content, description_text),
     )
     jd_id = cur.lastrowid
     conn.commit()
@@ -184,7 +185,7 @@ def add_job_description(title: str, filename: str, content: bytes) -> int:
 def get_all_jds() -> list[dict]:
     conn = get_conn()
     cur = conn.cursor()
-    cur.execute("SELECT id, title, filename, created_at FROM job_descriptions ORDER BY created_at DESC")
+    cur.execute("SELECT id, title, filename, description_text, created_at FROM job_descriptions ORDER BY created_at DESC")
     rows = cur.fetchall()
     conn.close()
     return [dict(r) for r in rows]

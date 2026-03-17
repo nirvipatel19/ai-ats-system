@@ -224,7 +224,11 @@ async def submit_jd(
         raise HTTPException(status_code=400, detail="Job description must be PDF or DOCX.")
     
     content = await jd_document.read()
-    jd_id = add_job_description(title, jd_document.filename, content)
+    
+    # Extract text from JD so students can read it in the portal
+    jd_text, _ = parse_document_text(content, jd_document.filename)
+    
+    jd_id = add_job_description(title, jd_document.filename, content, description_text=jd_text)
     logger.info(f"Stored JD: {title} (ID: {jd_id})")
     return {"message": "Job description submitted successfully", "jd_id": jd_id}
 

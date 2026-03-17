@@ -1158,3 +1158,32 @@ button:disabled {
 .section-divider-top {
   border-top: 1px solid var(--border-color);
 }
+
+.description-preview {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin: 0.5rem 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  line-height: 1.5;
+}
+
+.job-full-description {
+  padding: 1rem 1.5rem;
+  max-height: 400px;
+  overflow-y: auto;
+  background: rgba(255, 255, 255, 0.3);
+  line-height: 1.6;
+}
+
+.description-content p {
+  margin-bottom: 0.8rem;
+  font-size: 0.95rem;
+}
+
+.job-card-body {
+  margin-bottom: 1rem;
+}
