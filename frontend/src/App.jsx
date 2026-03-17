@@ -205,30 +205,24 @@ function AuthPage({ onLogin }) {
             <form onSubmit={handleSubmit}>
               <div className="input-group">
                 <label>Email Address</label>
-                <div className="input-with-icon">
-                  <Icons.User />
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="name@company.com"
-                    required
-                  />
-                </div>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="name@company.com"
+                  required
+                />
               </div>
               
               <div className="input-group">
                 <label>Password</label>
-                <div className="input-with-icon">
-                  <Icons.Settings />
-                  <input
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="••••••••"
-                    required
-                  />
-                </div>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  required
+                />
               </div>
               
               {error && <div className="feedback error-feedback"><Icons.XCircle/> {error}</div>}
