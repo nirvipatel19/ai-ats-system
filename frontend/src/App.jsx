@@ -193,15 +193,7 @@ function AuthPage({ onLogin }) {
 
   return (
     <div className="auth-container">
-      <div className="auth-split">
-        <div className="auth-hero">
-          <div className="hero-content">
-            <div className="logo-icon large">AI</div>
-            <h1>Next-Gen AI Recruiting</h1>
-            <p>Streamline your hiring process with advanced machine learning algorithms and role-based agent architecture.</p>
-          </div>
-        </div>
-        <div className="auth-form-wrapper">
+      <div className="auth-card-wrapper">
           <div className="auth-card">
             <h2>{isLogin ? 'Welcome Back' : 'Create Account'}</h2>
             <p className="auth-subtitle">
@@ -259,7 +251,6 @@ function AuthPage({ onLogin }) {
               </p>
             </div>
           </div>
-        </div>
       </div>
     </div>
   );

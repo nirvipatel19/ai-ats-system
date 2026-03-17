@@ -301,67 +301,30 @@ body {
   display: flex;
   background: var(--bg-base);
   color: var(--text-primary);
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at top left, rgba(99, 102, 241, 0.05), transparent),
+              radial-gradient(circle at bottom right, rgba(139, 92, 246, 0.05), transparent);
 }
 
-.auth-split {
-  display: flex;
+.auth-card-wrapper {
   width: 100%;
-}
-
-.auth-hero {
-  flex: 1.2;
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.05), rgba(139, 92, 246, 0.05)), url('https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80');
-  background-size: cover;
-  background-position: center;
-  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 3rem;
-}
-
-.auth-hero::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(255, 255, 255, 0.85); /* Light overlay */
-  backdrop-filter: blur(8px);
-}
-
-.hero-content {
-  position: relative;
-  z-index: 1;
-  max-width: 480px;
-}
-
-.hero-content h1 {
-  font-size: 2.5rem;
-  font-weight: 700;
-  margin-bottom: 1rem;
-  line-height: 1.2;
-  background: linear-gradient(to right, var(--primary-color), var(--accent-color));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.hero-content p {
-  font-size: 1.1rem;
-  color: var(--text-secondary);
-  font-weight: 500;
-}
-
-.auth-form-wrapper {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 3rem;
-  background: var(--bg-base);
+  padding: 2rem;
 }
 
 .auth-card {
   width: 100%;
-  max-width: 400px;
+  max-width: 440px;
+  padding: 3rem;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
 }
 
 .auth-card h2 {
