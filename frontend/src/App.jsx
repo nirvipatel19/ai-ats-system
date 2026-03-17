@@ -195,7 +195,7 @@ function AuthPage({ onLogin }) {
     <div className="auth-container">
       <div className="auth-card-wrapper">
           <div className="auth-card">
-            <h2>{isLogin ? 'Welcome Back' : 'Create Account'}</h2>
+            <h2>{isLogin ? 'AI-ATS System' : 'Create Account'}</h2>
             <p className="auth-subtitle">
               {isLogin 
                 ? 'Enter your credentials to access your account.' 
