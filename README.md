@@ -1,6 +1,6 @@
-# Premium AI-powered ATS Resume Screening System
+# Premium Academic AI-powered ATS System
 
-A modern, high-performance Applicant Tracking System (ATS) built with **FastAPI**, **React**, and **Agent-based AI**. This system automates the recruitment process by intelligently parsing resumes, extracting technical skills, and scoring candidates against Job Descriptions (JDs) with high precision.
+A modern, high-performance Applicant Tracking System (ATS) built with **FastAPI**, **React**, and **Agent-based AI**. This system has been specifically tailored for academic use cases, allowing professors and administrators to bulk-upload folders of student resumes or ZIP files and automatically rank them against specific Job Descriptions (JDs) or Rubrics.
 
 ---
 
@@ -16,8 +16,7 @@ A modern, high-performance Applicant Tracking System (ATS) built with **FastAPI*
 - **Advanced OCR (300 DPI)**: High-resolution scanning ensures reliable text extraction from scanned or image-based PDF resumes.
 
 ### 🎨 User Experience
-- **Admin Dashboard**: Features a "Target Tech" visualization, showing exactly which keywords the AI extracted from the JD to score candidates.
-- **Student Portal**: Transparent Job Description views allow students to read requirements before applying.
+- **Academic Admin Console**: A single-view centralized dashboard to manage pipelines, upload bulk student data (folders or ZIPs), and view real-time analysis.
 - **Glassmorphism UI**: A premium, modern design with real-time feedback and smooth animations.
 
 ---
@@ -26,11 +25,10 @@ A modern, high-performance Applicant Tracking System (ATS) built with **FastAPI*
 
 The system has been designed with the following core business logic and assumptions:
 
-1.  **Technical Primacy**: The screening logic prioritizes technical tech-stack overlap. Soft skills (e.g., "Leadership") and education levels (e.g., "B.Tech") are excluded from the primary skill-matching score to ensure objective technical vetting.
-2.  **60% Shortlist Bar**: A candidate is automatically marked as **"Shortlisted"** if they possess at least **60%** of the technical skills extracted from the Job Description.
-3.  **Unique Applications**: To prevent spam and ensure data integrity, students are restricted to **one application per job role**.
-4.  **Semantic Match Fallback**: While skill-matching is the primary shortlisting criteria, the system calculates a secondary **Semantic AI Score** (using Sentence-Transformers) to understand the broader context and descriptive experience in a resume.
-5.  **Admin Hierarchy**: The first user to register on a clean system is automatically assigned the primary Admin role.
+1. **Technical Primacy**: The screening logic prioritizes technical tech-stack overlap. Soft skills (e.g., "Leadership") and education levels (e.g., "B.Tech") are excluded from the primary skill-matching score to ensure objective technical vetting.
+2. **60% Shortlist Bar**: A candidate is automatically marked as **"Shortlisted"** if they possess at least **60%** of the technical skills extracted from the Job Description.
+3. **Academic Workflow**: The system is designed for professors/admins to upload folders or `.zip` files of multiple student resumes against a specific rubric or JD, evaluating entire cohorts simultaneously.
+4. **Semantic Match Fallback**: While skill-matching is the primary shortlisting criteria, the system calculates a secondary **Semantic AI Score** (using Sentence-Transformers) to understand the broader context and descriptive experience in a resume.
 
 ---
 

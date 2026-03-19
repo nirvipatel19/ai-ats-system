@@ -1,7 +1,9 @@
 """FastAPI ATS Resume Screening Backend - Role-based API with Auth & DB."""
 import logging
 from datetime import datetime
-from typing import Optional
+from typing import Optional, List
+import zipfile
+import io
 
 from fastapi import Depends, FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
@@ -107,8 +109,7 @@ def register(req: RegisterRequest):
     if get_user_by_email(req.email):
         raise HTTPException(status_code=400, detail="Email already registered")
         
-    admin_count = get_admin_count()
-    role = "admin" if admin_count == 0 else "student"
+    role = "admin" # Always make user admin for academic tool
     
     pw_hash = hash_password(req.password)
     create_user(req.email.lower(), pw_hash, role)
@@ -231,6 +232,49 @@ async def submit_jd(
     jd_id = add_job_description(title, jd_document.filename, content, description_text=jd_text)
     logger.info(f"Stored JD: {title} (ID: {jd_id})")
     return {"message": "Job description submitted successfully", "jd_id": jd_id}
+
+
+@app.post("/upload-resumes-bulk/{jd_id}")
+async def upload_resumes_bulk(
+    jd_id: int,
+    files: List[UploadFile] = File(...),
+    admin: dict = Depends(require_admin),
+):
+    jd = get_jd_by_id(jd_id)
+    if not jd:
+        raise HTTPException(status_code=404, detail="Job description not found")
+
+    count = 0
+    # Process files
+    for file in files:
+        if not file.filename:
+            continue
+            
+        content = await file.read()
+        filename = file.filename.lower()
+        
+        if filename.endswith(".pdf"):
+            add_resume(admin["id"], jd_id, file.filename, content)
+            count += 1
+        elif filename.endswith(".zip"):
+            try:
+                with zipfile.ZipFile(io.BytesIO(content)) as z:
+                    for zinfo in z.infolist():
+                        if zinfo.filename.lower().endswith(".pdf") and "__MACOSX" not in zinfo.filename and not zinfo.filename.split('/')[-1].startswith('._'):
+                            pdf_content = z.read(zinfo)
+                            # Get just the basic filename if it was inside a folder
+                            base_name = zinfo.filename.split('/')[-1]
+                            if base_name:
+                                add_resume(admin["id"], jd_id, base_name, pdf_content)
+                                count += 1
+            except Exception as e:
+                logger.error(f"Failed to extract zip file {filename}: {str(e)}")
+                
+    return {
+        "message": f"Successfully uploaded {count} resumes",
+        "total_resumes": get_resume_count_for_jd(jd_id),
+    }
+
 
 
 @app.post("/run-analysis/{jd_id}")

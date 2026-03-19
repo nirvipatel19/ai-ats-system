@@ -130,7 +130,7 @@ function App() {
               <Icons.User />
             </div>
             <div className="user-info">
-              <span className="user-role">{role === 'student' ? 'Candidate' : 'Administrator'}</span>
+              <span className="user-role">Professor / Admin</span>
             </div>
           </div>
           <button className="logout-btn" onClick={handleLogout}>
@@ -142,13 +142,13 @@ function App() {
       <main className="main-content">
         <header className="topbar">
           <div className="page-title">
-            <h1>{role === 'student' ? 'Candidate Portal' : 'Admin Console'}</h1>
-            <p className="subtitle">Welcome back. Here is your overview.</p>
+            <h1>Academic ATS Console</h1>
+            <p className="subtitle">Welcome back. Manage your classes and pipelines.</p>
           </div>
         </header>
         
         <div className="content-scroll">
-          {role === 'student' ? <StudentPage /> : <AdminPage />}
+          <AdminPage />
         </div>
       </main>
     </div>
@@ -250,248 +250,7 @@ function AuthPage({ onLogin }) {
   );
 }
 
-function StudentPage() {
-  const [file, setFile] = useState(null);
-  const [jds, setJds] = useState([]);
-  const [selectedJd, setSelectedJd] = useState(null);
-  const [myResumes, setMyResumes] = useState([]);
-  const [checkJdId, setCheckJdId] = useState('');
-  const [checkFilename, setCheckFilename] = useState('');
-  const [status, setStatus] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [successMsg, setSuccessMsg] = useState('');
-  const [checkingStatus, setCheckingStatus] = useState(false);
-
-  const fetchJds = async () => {
-    try {
-      const res = await api().get('/jds');
-      setJds(res.data.jds || []);
-    } catch (_) {}
-  };
-
-  const fetchMyResumes = async () => {
-    try {
-      const res = await api().get('/my-resumes');
-      setMyResumes(res.data.resumes || []);
-      if (res.data.resumes?.length && !checkFilename) {
-        setCheckFilename(res.data.resumes[0].filename);
-        const jd = jds.find(j => j.title === res.data.resumes[0].jd_title);
-        if (jd) setCheckJdId(jd.id);
-      }
-    } catch (_) {}
-  };
-
-  useEffect(() => {
-    fetchJds();
-  }, []);
-
-  useEffect(() => {
-    if (jds.length) fetchMyResumes();
-  }, [jds, successMsg, checkFilename]);
-
-  const handleUpload = async (e) => {
-    e.preventDefault();
-    setError('');
-    setSuccessMsg('');
-    if (!file) {
-      setError('Please select a PDF file.');
-      return;
-    }
-    if (!selectedJd) {
-      setError('Please select a job for your application.');
-      return;
-    }
-    setLoading(true);
-    try {
-      const formData = new FormData();
-      formData.append('resume', file);
-      const res = await api().post(`/upload-resume?jd_id=${selectedJd}`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
-      setSuccessMsg(`Successfully applied with ${res.data.filename}`);
-      setCheckFilename(res.data.filename);
-      setCheckJdId(selectedJd);
-      setFile(null);
-      if (document.getElementById('resume-input')) {
-        document.getElementById('resume-input').value = '';
-      }
-    } catch (err) {
-      setError(err.response?.data?.detail || err.message || 'Upload failed.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleCheckStatus = async (e) => {
-    e.preventDefault();
-    setCheckingStatus(true);
-    try {
-      const res = await api().get(`/status/${checkJdId}/${encodeURIComponent(checkFilename)}`);
-      setStatus(res.data);
-    } catch (err) {
-      // ignore
-    } finally {
-      setCheckingStatus(false);
-    }
-  };
-
-  const selectedJobDetail = selectedJd ? jds.find(j => j.id === selectedJd) : null;
-
-  return (
-    <div className="dashboard-grid">
-      <div className="main-column">
-        <section className="glass-panel">
-          <div className="panel-header">
-            <h3><Icons.Briefcase /> Available Opportunities</h3>
-            <span className="badge-count">{jds.length} Jobs</span>
-          </div>
-          
-          <div className="cards-grid">
-            {jds.length > 0 ? (
-              jds.map(jd => (
-                <div key={jd.id} className={`job-card ${selectedJd === jd.id ? 'selected' : ''}`} onClick={() => setSelectedJd(jd.id)}>
-                  <div className="job-card-header">
-                    <h4>{jd.title}</h4>
-                  </div>
-                  <div className="job-card-body">
-                    <p className="description-preview">
-                      {jd.description_text 
-                        ? jd.description_text.slice(0, 150) + "..." 
-                        : "Click to view full description."}
-                    </p>
-                  </div>
-                  <div className="job-card-meta">
-                    <span className="meta-tag"><Icons.FileText /> Description loaded</span>
-                  </div>
-                  <button className={`select-btn ${selectedJd === jd.id ? 'active' : ''}`}>
-                    {selectedJd === jd.id ? 'Selected to Apply' : 'View & Apply'}
-                  </button>
-                </div>
-              ))
-            ) : (
-              <div className="empty-state">
-                <Icons.Briefcase />
-                <p>No open positions at the moment.</p>
-              </div>
-            )}
-          </div>
-        </section>
-
-        {selectedJd && (
-          <section className="glass-panel slide-up">
-            <div className="panel-header">
-              <h3><Icons.FileText /> Job Details: {selectedJobDetail?.title}</h3>
-            </div>
-            <div className="job-full-description">
-              <div className="description-content">
-                {selectedJobDetail?.description_text ? (
-                   selectedJobDetail.description_text.split('\n').map((line, i) => (
-                     <p key={i}>{line}</p>
-                   ))
-                ) : (
-                  <p className="dim">No detailed description available for this role.</p>
-                )}
-              </div>
-            </div>
-          </section>
-        )}
-
-        {selectedJd && (
-          <section className="glass-panel slide-up">
-            <div className="panel-header">
-              <h3><Icons.Upload /> Apply for {selectedJobDetail?.title}</h3>
-            </div>
-            
-            <form onSubmit={handleUpload} className="modern-form">
-              <div className="file-upload-zone">
-                <input
-                  id="resume-input"
-                  type="file"
-                  accept=".pdf"
-                  onChange={(e) => setFile(e.target.files?.[0] || null)}
-                  className="file-input-hidden"
-                />
-                <label htmlFor="resume-input" className="file-upload-label">
-                  <div className="upload-icon-large"><Icons.Upload /></div>
-                  <span className="upload-title">{file ? file.name : "Click to select or drag PDF here"}</span>
-                  <span className="upload-subtitle">Only .pdf files are accepted. Max 5MB.</span>
-                </label>
-              </div>
-              
-              {error && <div className="feedback error-feedback"><Icons.XCircle/> {error}</div>}
-              {successMsg && <div className="feedback success-feedback"><Icons.CheckCircle/> {successMsg}</div>}
-              
-              <div className="form-actions">
-                <button type="submit" disabled={loading || !file} className="btn-primary">
-                  {loading ? <span className="spinner"></span> : 'Submit Application'}
-                </button>
-              </div>
-            </form>
-          </section>
-        )}
-      </div>
-
-      <div className="side-column">
-        <section className="glass-panel">
-          <div className="panel-header">
-            <h3>Track Status</h3>
-          </div>
-          
-          <form onSubmit={handleCheckStatus} className="status-form">
-            <div className="input-group">
-              <label>Select Your Application</label>
-              {myResumes.length > 0 ? (
-                <select className="premium-select" value={`${checkJdId}|${checkFilename}`} onChange={(e) => {
-                  const [jid, fn] = e.target.value.split('|');
-                  setCheckJdId(jid);
-                  setCheckFilename(fn);
-                  setStatus(null);
-                }}>
-                  {myResumes.map(r => (
-                    <option key={`${r.jd_title}|${r.filename}`} value={`${jds.find(j => j.title === r.jd_title)?.id}|${r.filename}`}>
-                      {r.jd_title} ({r.filename})
-                    </option>
-                  ))}
-                </select>
-              ) : (
-                <div className="empty-select">You haven't applied yet.</div>
-              )}
-            </div>
-            
-            <button type="submit" disabled={checkingStatus || !myResumes.length} className="btn-secondary full-width">
-              {checkingStatus ? <span className="spinner"></span> : 'Check Analysis Result'}
-            </button>
-          </form>
-
-          {status && (
-            <div className={`status-result-card ${status.passed === true ? 'approved' : status.passed === false ? 'rejected' : 'pending'}`}>
-              <div className="status-icon">
-                {status.passed === true ? <Icons.CheckCircle /> : status.passed === false ? <Icons.XCircle /> : <Icons.Clock />}
-              </div>
-              <div className="status-body">
-                <h4>{status.filename}</h4>
-                <p className="status-message">{status.message}</p>
-                {status.score != null && (
-                  <div className="status-metrics">
-                    <div className="metric">
-                      <span className="metric-label">AI Score</span>
-                      <span className="metric-value">{(status.score * 100).toFixed(0)}%</span>
-                    </div>
-                    <div className="metric">
-                      <span className="metric-label">Rank</span>
-                      <span className="metric-value">#{status.rank}</span>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-        </section>
-      </div>
-    </div>
-  );
-}
+// Student Page completely removed in favor of Professor/Admin direct bulk upload
 
 function AdminPage() {
   const [title, setTitle] = useState('');
@@ -505,6 +264,11 @@ function AdminPage() {
   const [jdStats, setJdStats] = useState({});
   const [runningAnalysis, setRunningAnalysis] = useState(false);
   const [successMsg, setSuccessMsg] = useState('');
+  
+  // Bulk upload states
+  const [uploadingBulk, setUploadingBulk] = useState(false);
+  const [bulkSuccess, setBulkSuccess] = useState('');
+  const [bulkError, setBulkError] = useState('');
 
   const fetchJds = async () => {
     try {
@@ -604,6 +368,33 @@ function AdminPage() {
     }
   };
 
+  const handleBulkUpload = async (e) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    
+    setUploadingBulk(true);
+    setBulkError('');
+    setBulkSuccess('');
+    
+    const formData = new FormData();
+    for (let i = 0; i < files.length; i++) {
+      formData.append('files', files[i]);
+    }
+    
+    try {
+      const res = await api().post(`/upload-resumes-bulk/${selectedJdId}`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      setBulkSuccess(res.data.message || `Successfully uploaded resumes.`);
+      fetchJdStats(selectedJdId);
+      e.target.value = null; // reset input
+    } catch (err) {
+      setBulkError(err.response?.data?.detail || err.message || 'Upload failed.');
+    } finally {
+      setUploadingBulk(false);
+    }
+  };
+
   return (
     <div className="dashboard-grid admin-grid">
       <div className="main-column">
@@ -643,6 +434,53 @@ function AdminPage() {
             )}
           </div>
         </section>
+
+        {selectedJdId && (
+          <section className="glass-panel slide-up" style={{ marginBottom: '1.5rem' }}>
+            <div className="panel-header">
+              <h3><Icons.Upload /> Upload Resumes (Folder or ZIP)</h3>
+            </div>
+            <div className="modern-form" style={{ padding: '1.5rem' }}>
+              <p className="dim" style={{ marginBottom: '1rem', fontSize: '0.9rem' }}>
+                Select a folder containing multiple student profiles (.pdf), or upload a .zip file of resumes.
+              </p>
+              
+              <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+                <div style={{ flex: 1 }}>
+                  <label className="btn-secondary" style={{ display: 'flex', justifyContent: 'center', width: '100%', cursor: 'pointer' }}>
+                    {uploadingBulk ? 'Uploading...' : 'Upload Folder'}
+                    <input 
+                      type="file" 
+                      webkitdirectory="true" 
+                      directory="true" 
+                      multiple 
+                      onChange={handleBulkUpload} 
+                      disabled={uploadingBulk} 
+                      style={{ display: 'none' }} 
+                    />
+                  </label>
+                </div>
+                
+                <div style={{ flex: 1 }}>
+                  <label className="btn-secondary" style={{ display: 'flex', justifyContent: 'center', width: '100%', cursor: 'pointer' }}>
+                    {uploadingBulk ? 'Uploading...' : 'Upload ZIP/Files'}
+                    <input 
+                      type="file" 
+                      multiple 
+                      accept=".pdf,.zip"
+                      onChange={handleBulkUpload} 
+                      disabled={uploadingBulk} 
+                      style={{ display: 'none' }} 
+                    />
+                  </label>
+                </div>
+              </div>
+              
+              {bulkError && <div className="feedback error-feedback" style={{marginTop: '1rem'}}><Icons.XCircle/> {bulkError}</div>}
+              {bulkSuccess && <div className="feedback success-feedback" style={{marginTop: '1rem'}}><Icons.CheckCircle/> {bulkSuccess}</div>}
+            </div>
+          </section>
+        )}
 
         {selectedJdId && (
           <section className="glass-panel results-panel fade-in">
